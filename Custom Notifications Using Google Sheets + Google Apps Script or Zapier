@@ -1,0 +1,34 @@
+function sendBPAlert() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("BP Readings");
+  var lastRow = sheet.getLastRow();
+  var systolic = sheet.getRange(lastRow, 1).getValue();  // Assuming systolic is in column 1
+  var diastolic = sheet.getRange(lastRow, 2).getValue(); // Assuming diastolic is in column 2
+
+  if (systolic < 120 && diastolic < 80) {
+    sendNotification("Congratulations on better blood pressure!");
+  } else if (systolic > 130 || diastolic > 80) {
+    sendNotification("Get to work! Your blood pressure is getting worse.");
+  }
+}
+
+function sendNotification(message) {
+  var phoneNumber = "YOUR_PHONE_NUMBER"; // Add your phone number here
+  var messageBody = message;
+  var smsUrl = "https://api.twilio.com/2010-04-01/Accounts/YOUR_ACCOUNT_SID/Messages.json";
+  
+  var payload = {
+    "To": phoneNumber,
+    "From": "YOUR_TWILIO_PHONE_NUMBER",
+    "Body": messageBody
+  };
+
+  var options = {
+    "method" : "POST",
+    "payload" : payload,
+    "headers" : {
+      "Authorization" : "Basic " + Utilities.base64Encode("YOUR_ACCOUNT_SID:YOUR_AUTH_TOKEN")
+    }
+  };
+  
+  UrlFetchApp.fetch(smsUrl, options);
+}
